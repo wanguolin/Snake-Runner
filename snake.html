@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+  <title>snake game</title>
+  <canvas id="snake" style="border: 1px solid;"  width="1200" height="600"> </canvas>
+  
+  <script>
+	var canvas=document.getElementById('snake');
+    var context=canvas.getContext('2d');
+	func = new snake( 5, 5);
+	func.draw();		
+  
+    function snake( x, y){
+    	var body = new Array( [x, y], [x+=5, y], [x+=5, y], [x+=5, y], [x+=5, y]), level = 1, speed = 7, speed_level = 50, cube = 7, dir;
+ 		this.setDir = function( direction){
+			this.dir = direction;
+		}
+		this.draw = function(){
+			context.clearRect( 0, 0, canvas.width, canvas.height);
+			
+			dir = 'right';
+			if( dir == 'up')
+				body.push( [body[body.length-1][0], body[body.length-1][1] += cube]);
+			else if( dir == 'down')
+				body.push( [body[body.length-1][0], body[body.length-1][1] -= cube]);
+			else if( dir == 'left')
+				body.push( [body[body.length-1][0] -= cube, body[body.length-1][1]]);
+			else if( dir == 'right')
+				body.push( [body[body.length-1][0] += cube, body[body.length-1][1]]);
+
+			body.shift();
+			for( i = 0; i < body.length; i++)
+				context.fillRect( body[i][0], body[i][1], cube, cube);
+	
+			window.obj = this;
+			this.timerID ? this.timerID = ( clearTimeout( timerID), setTimeout( "obj.draw()", speed*speed_level)): setTimeout( "obj.draw()", speed*speed_level);
+		}
+	}
+    
+  </script>
+</html>
+
