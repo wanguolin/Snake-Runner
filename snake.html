@@ -5,10 +5,11 @@
   
   <script>
 	var canvas=document.getElementById('snake'), context=canvas.getContext('2d'), keycode;
-    document.addEventListener("keypress", function(e){ keycode=e.keyCode; }, false);
+    document.addEventListener("keypress", function(e){ keycode=(Math.abs(keycode-e.keyCode)==2)?keycode:e.keyCode; }, false);
 	func = new snake( 5, 5, 39);
 	func.draw();		
   
+ 
     function snake( x, y, dir){
     	var level = 1, speed = 7, speed_level = 50, lastkey = dir, cube = 7, body = new Array( [x, y], [x+=cube, y], [x+=cube, y], [x+=cube, y], [x+=cube, y], [x+=cube, y], [x+=cube, y]);
 	
