@@ -1,42 +1,39 @@
 <!DOCTYPE html>
 <html>
-  <title>snake game</title>
-  <canvas id="snake" style="border: 1px solid;"  width="1200" height="600"> </canvas>
-  
-  <script>
-	var canvas=document.getElementById('snake'), context=canvas.getContext('2d'), keycode;
-    document.addEventListener("keypress", function(e){ keycode=(Math.abs(keycode-e.keyCode)==2)?keycode:e.keyCode; }, false);
-	func = new snake( 5, 5, 39);
-	func.draw();		
-  
- 
-    function snake( x, y, dir){
-    	var level = 1, speed = 7, speed_level = 50, lastkey = dir, cube = 7, body = new Array( [x, y], [x+=cube, y], [x+=cube, y], [x+=cube, y], [x+=cube, y], [x+=cube, y], [x+=cube, y]);
-	
-		this.draw = function(){
-			context.clearRect( 0, 0, canvas.width, canvas.height);
-			switch( keycode)
-			{
-				case 38 : body.push( [body[body.length-1][0], body[body.length-1][1] - cube]);
-				break;
-				case 40 : body.push( [body[body.length-1][0], body[body.length-1][1] + cube]);
-				break;
-				case 37 : body.push( [body[body.length-1][0] - cube, body[body.length-1][1]]);
-				break;
-				case 39 : body.push( [body[body.length-1][0] + cube, body[body.length-1][1]]);
-				break;
-				default: keycode = lastkey;
-			}
-
-			body.shift();
-			for( i = 0; i < body.length; i++)
-				context.fillRect( body[i][0], body[i][1], cube, cube);
-	
-			window.obj = this;
-			this.timerID ? this.timerID = ( clearTimeout( timerID), setTimeout( "obj.draw()", speed*speed_level)): setTimeout( "obj.draw()", speed*speed_level);
+	<title>snake game</title>
+	<canvas id="snake" style="border: 1px solid;" width="280" height="280"></canvas>
+	<script>
+		var xx, yy, s1_x = 7, s1_y = 7, canvas = document.getElementById('snake'), cube = 7, context = canvas.getContext('2d'), s1_keycode = 39, s1_lastkey = s1_keycode, s1 = new Array([s1_x, s1_y], [s1_x += cube, s1_y], [s1_x += cube, s1_y], [s1_x += cube, s1_y], [s1_x += cube, s1_y], [s1_x += cube, s1_y], [s1_x += cube, s1_y]), s1_speed = 210;
+		document.addEventListener("keydown", function(e) { s1_keycode = (Math.abs(s1_keycode - e.keyCode) == 2 || e.keyCode < 37 || e.keyCode > 40) ? s1_keycode : e.keyCode;}, false);
+		setTimeout("chk_move_s1()", s1_speed), setInterval(draw,100), gen_food();
+		
+		function gen_food(){
+			while( is_over( xx = Math.round( (canvas.width/cube)*Math.random())*cube, yy = Math.round( (canvas.width/cube)*Math.random())*cube));
 		}
-	}
-    
-  </script>
+		function is_over( x, y){
+			for( i = 0; i < s1.length - 1; i++)
+				if( x == s1[i][0] && y == s1[i][1])
+					return true;
+			return ( x == 0 || x == canvas.width || y == 0 || y == canvas.height)? true : false;
+		}
+		function chk_move_s1() {
+			switch( s1_keycode) {
+				case 38 : s1.push([s1[s1.length-1][0], s1[s1.length-1][1] - cube]);
+					break;
+				case 40 : s1.push([s1[s1.length-1][0], s1[s1.length-1][1] + cube]);
+					break;
+				case 37 : s1.push([s1[s1.length-1][0] - cube, s1[s1.length-1][1]]);
+					break;
+				case 39 : s1.push([s1[s1.length-1][0] + cube, s1[s1.length-1][1]]);
+					break;
+			}
+			is_over( s1[s1.length-1][0], s1[s1.length-1][1]) ? (alert( "Game Over"), location.reload()): setTimeout("chk_move_s1()", s1_speed), ( !(s1[s1.length-1][0] == xx && s1[s1.length-1][1] == yy) ? s1.shift() : (( (s1_speed - 100) > 0?s1_speed-=20:1), gen_food()));
+		}
+		function draw(){
+			context.clearRect(0, 0, canvas.width, canvas.height);
+			for( i = 0; i < s1.length; i++)
+				context.fillRect(s1[i][0], s1[i][1], cube, cube);
+			context.fillRect( xx, yy, cube, cube);
+		}
+	</script>
 </html>
-
