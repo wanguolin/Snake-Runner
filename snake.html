@@ -1,18 +1,20 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
+	<meta charset="UTF-8">
 	<title>snake game</title>
 	<table>
-		<tr>	<td><canvas id="snake" style="border: 1px solid;" width="280" height="280"></canvas>  </td></tr>
-		<tr>    <td><textarea id="chat_log" name="chat_log" cols="40" rows="5">Enter your comments here...</textarea> </td></tr>
-		<tr>	<td><input type="text" id="chat" onkeydown="javascript:event.keyCode==13?send():1" />   </td></tr>
-	
+		<tr> <td rowspan="11"><canvas id="snake" style="border: 1px solid;" width="600" height="600"></canvas></td></tr>
+		<tr> <td><input type=radio name="player" VALUE="S" checked onclick="location.reload()">单人游戏</input> </td>
+		<tr> <td><input type=radio name="player" VALUE="M" onclick="location.reload()" >多人游戏</td> </input>  <tr>
+		<tr> <td>服务器IP地址：<input type="text" value="127.0.0.1"/></td></tr>
+		<tr> <td><textarea id="chat_log" name="chat_log" cols="30" rows="5">服务器信息</textarea> </td> </tr>
+		<tr> <td><input type="text" id="chat" onkeydown="javascript:event.keyCode==13?send():1" />   </td></tr>
 	</table>
 	
 	<script>
-		var host = "127.0.0.1", port = 8080, url = 'ws://' + host + ':' + port + '/', w = new WebSocket( url), xx, yy, s1_x = 7, s1_y = 7, canvas = document.getElementById('snake'), cube = 7, context = canvas.getContext('2d'), s1_keycode = 39, s1_lastkey = s1_keycode, s1 = new Array([s1_x, s1_y], [s1_x += cube, s1_y], [s1_x += cube, s1_y], [s1_x += cube, s1_y], [s1_x += cube, s1_y], [s1_x += cube, s1_y], [s1_x += cube, s1_y]), s1_speed = 210;
+		var urlTalk = 'ws://127.0.0.1:8080/', w = new WebSocket( urlTalk), xx, yy, s1_x = 7, s1_y = 7, canvas = document.getElementById('snake'), cube = 7, context = canvas.getContext('2d'), s1_keycode = 39, s1_lastkey = s1_keycode, s1 = new Array([s1_x, s1_y], [s1_x += cube, s1_y], [s1_x += cube, s1_y], [s1_x += cube, s1_y], [s1_x += cube, s1_y], [s1_x += cube, s1_y], [s1_x += cube, s1_y]), s1_speed = 210;
 		document.addEventListener("keydown", function(e) { s1_keycode = (Math.abs(s1_keycode - e.keyCode) == 2 || e.keyCode < 37 || e.keyCode > 40) ? s1_keycode : e.keyCode;}, false);
-		w.onerror = function(error)
-		{
+		w.onerror = function(error){
 			alert( 'err');	
 		}
 		w.onopen = function(){}
