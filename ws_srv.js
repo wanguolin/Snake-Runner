@@ -17,11 +17,13 @@ wsServer = new WebSocketServer({
 wsServer.on('request', function(request) {
     var connection = request.accept(null, request.origin);
 	arr_conn.push( connection);
+	console.log( "connected!")
+	connection.sendUTF( "\n您已经与服务器建立了连接，准备好以后选择Ready开始游戏\n");
     // This is the most important callback for us, we'll handle
     // all messages from users here.
     connection.on('message', function(message) {
     	console.log( message.utf8Data);
-    	connection.sendUTF(message.utf8Data);
+    	
     	for( var i = 0; i < arr_conn.length; ++i)
     		arr_conn[i].sendUTF(message.utf8Data);
         if (message.type === 'utf8') {
