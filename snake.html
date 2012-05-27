@@ -13,12 +13,12 @@
 	</table>
 	
 	<script>
-		var IsSingle = document.all['playerNum'].value == 'S' ? true : false, ip =  document.getElementById('ip').value, urlTalk = 'ws://'+ ip + ':8080/', urlCtrl = 'ws://'+ ip + ':8081/', wTalk = new WebSocket( urlTalk), xx, yy, s1_x = 7, s1_y = 7, canvas = document.getElementById('snake'), cube = 7, context = canvas.getContext('2d'), s1_keycode = 39, s1_lastkey = s1_keycode, s1 = new Array([s1_x, s1_y], [s1_x += cube, s1_y], [s1_x += cube, s1_y], [s1_x += cube, s1_y], [s1_x += cube, s1_y], [s1_x += cube, s1_y], [s1_x += cube, s1_y]), s1_speed = 210;
-		document.all['playerNum'][localStorage.getItem( 'player') == 'S' ? 0 : 1].checked = true;	
+		var IsSingle = localStorage.getItem( 'player') == 'S' ? true : false, ip =  document.getElementById('ip').value, url = 'ws://'+ ip + ':8080/', w = new WebSocket( url), xx, yy, s1_x = 7, s1_y = 7, canvas = document.getElementById('snake'), cube = 7, context = canvas.getContext('2d'), s1_keycode = 39, s1_lastkey = s1_keycode, s1 = new Array([s1_x, s1_y], [s1_x += cube, s1_y], [s1_x += cube, s1_y], [s1_x += cube, s1_y], [s1_x += cube, s1_y], [s1_x += cube, s1_y], [s1_x += cube, s1_y]), s1_speed = 210;
+		document.all['playerNum'][ IsSingle ? 1 : 0].checked = true;	
 		document.addEventListener("keydown", function(e) { s1_keycode = (Math.abs(s1_keycode - e.keyCode) == 2 || e.keyCode < 37 || e.keyCode > 40) ? s1_keycode : e.keyCode;}, false);
-		wTalk.onerror = function(error){	alert( 'err');	}
-		wTalk.onmessage = function(msg){	document.getElementById('chat_log').innerHTML += msg.data + "\n" ;	}
-		function send()				   {	wTalk.send( document.getElementById('chat').value);		}
+		w.onerror = function(error){	alert( 'err');	}
+		w.onmessage = function(msg){	document.getElementById('chat_log').innerHTML += msg.data + "\n" ;	}
+		function send()				   {	w.send( document.getElementById('chat').value);		}
 		setTimeout("chk_move_s1()", s1_speed), setInterval(draw,100), gen_food();
 		
 		function gen_food(){
