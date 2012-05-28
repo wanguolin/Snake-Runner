@@ -14,55 +14,62 @@
 	</table>
 	
 	<script>
-	var cube = x = y = 7, snake1 = new Array( [7,7]); 
-	function snake( s)
+	canvas = document.getElementById('snake');
+	context = canvas.getContext('2d');
+	document.addEventListener("keydown", function(e) { keyCode = (Math.abs(keyCode - e.keyCode) == 2 || e.keyCode < 37 || e.keyCode > 40) ? keyCode : e.keyCode;}, false);
+	var cube = x = y = 7, snake1 = new snake( x, y), i, keyCode = 39, xx,yy; 
+	genFood();
+	setTimeout( "_Move()", snake1.speed), setInterval(draw,100);		
+	function snake( x, y)
 	{
-		this.len = 2, this.body = new Array( s), this.color = "#000000";
-		for( this.i = 0; i < this.len; ++i)
-			this.body.push( this.body[this.body.length - 1][0] += cube, this.body[this.body.length - 1][1]);
+		this.len = 3, this.body = new Array( [x,y], [x+cube, y], [x+2*cube, y]), this.color = "#000000", this.ready = false, this.speed = 210;
 		this.Move = function()
 		{
+			this.lastX = this.body[this.body.length-1][0], this.lastY = this.body[this.body.length-1][1];
 			switch( keyCode) 
 			{
-				case 38 : this.body.push([this.body[this.body.length-1][0], this.body[this.body.length-1][1] - cube]);
+				case 38 : this.body.push([ this.lastX, this.lastY -= cube]);
 					break;
-				case 40 : this.body.push([this.body[this.body.length-1][0], this.body[this.body.length-1][1] + cube]);
+				case 40 : this.body.push([ this.lastX, this,lastY += cube]);
 					break;
-				case 37 : this.body.push([this.body[this.body.length-1][0] - cube, this.body[this.body.length-1][1]]);
+				case 37 : this.body.push([ this.lastX -= cube, this.lastY]);
 					break;
-				case 39 : this.body.push([this.body[snake1.body.length-1][0] + cube, this.body[this.body.length-1][1]]);
+				case 39 : this.body.push([ this.lastX += cube, this.lastY]);
 					break;
 			}
 			this.body.shift();
-		}
-		this.IsDead = function()
-		{
-			for( i = 0; i < this.body.length - 2; ++i)
-				if( this.body[this.body.length - 1][0] == this.body[i][0] && this.body[this.body.length - 1][1] == this.body[i][1])
-					return true;    
-			return this.body[this.body.length - 1][0] >=0 || this.body[this.body.length - 1][0] >= canvas.width || this.body[this.body.length - 1][1] >=0 || this.body[this.body.length - 1][1] >= canvas.height; 
-		}
+			IsDead( this.lastX, this.lastY) ? (alert( 'dead'), location.reload()) : 1;
+			setTimeout( "_Move()", snake1.speed);	
+		};
+	}
+	function IsDead( head_x, head_y){
+		for( i = 0; i < snake1.body.length - 2; i++)
+			if( head_x == snake1.body[i][0] && head_y == snake1.body[i][1])
+				return true;
+		return ( head_y <= 0 || head_y >= canvas.width || head_y <= 0 || head_y >= canvas.height) ? true : false;
 	}
 	function genFood()
 	{
-		
+		xx = Math.round( canvas.width*Math.random());
+		yy = Math.round( canvas.height*Math.random());
 	}	
 	function _Move()
 	{
-		
+		snake1.Move();
 	}
 	function draw()
 	{
 		context.clearRect(0, 0, canvas.width, canvas.height);
-		for( i = 0; i < snake1.length; i++)
-			context.fillRect(snake1[i][0], snake1[i][1], cube, cube);
+		for( i = 0; i < snake1.len - 1; i++)
+			context.fillRect(snake1.body[i][0], snake1.body[i][1], cube, cube);
+		context.fillRect( xx, yy, cube, cube);
 	}	
 	/*
 		var IsSingle = localStorage.getItem( 'player') == 'S' ? true : false, ip =  document.getElementById('ip').value, url, w, xx, yy, s1_x = 7, s1_y = 7, canvas = document.getElementById('snake'), cube = 7, context = canvas.getContext('2d'), s1_keycode = 39, s1_lastkey = s1_keycode, s1 = new Array([s1_x, s1_y], [s1_x += cube, s1_y], [s1_x += cube, s1_y], [s1_x += cube, s1_y]), s1_speed = 210;
 		
 		document.all['playerNum'][ IsSingle ? 0 : 1].checked = true;
 		document.all['mPlayer1'].style.visibility = document.all['mPlayer2'].style.visibility = document.all['mPlayer3'].style.visibility = (IsSingle?'hidden':'visiable');	
-		document.addEventListener("keydown", function(e) { s1_keycode = (Math.abs(s1_keycode - e.keyCode) == 2 || e.keyCode < 37 || e.keyCode > 40) ? s1_keycode : e.keyCode;}, false);
+		
 	
 		function connect(){
 			url = 'ws://'+ ip + ':8080/';
