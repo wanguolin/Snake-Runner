@@ -10,11 +10,52 @@
 		<tr id = 'mPlayer1'> <td>ClientID：<input id="ClientID" type="text" value="Player" size="20"/></td></tr>
 		<tr id = 'mPlayer2'> <td>服务器IP地址：<input id="ip" type="text" value="127.0.0.1" size="10"/><input id="conn" name ="conn" type="button" value="连接" onclick="connect()"/></td></tr>
 		<tr id = 'mPlayer3'> <td><textarea id="chat_log" name="chat_log" cols="30" rows="5">服务器信息</textarea> </td> </tr>
-		<tr id = 'mPlayer4'> <td><input type="text" id="chat" onkeydown="javascript:event.keyCode==13?send('dummy'):1" /> <input type="checkbox" id="ready" onclick="send('ready')">Ready</>  </td></tr>
+		<tr id = 'mPlayer4'> <td><input type="text" id="chat" onkeydown="javascript:event.keyCode==13?send():1" /> <input type="checkbox" id="ready" onclick="send()">Ready</>  </td></tr>
 	</table>
 	
 	<script>
+	var cube = x = y = 7, snake1 = new Array( [7,7]); 
+	function snake( s)
+	{
+		this.len = 2, this.body = new Array( s), this.color = "#000000";
+		for( this.i = 0; i < this.len; ++i)
+			this.body.push( this.body[this.body.length - 1][0] += cube, this.body[this.body.length - 1][1]);
+		this.Move = function()
+		{
+			switch( keyCode) 
+			{
+				case 38 : this.body.push([this.body[this.body.length-1][0], this.body[this.body.length-1][1] - cube]);
+					break;
+				case 40 : this.body.push([this.body[this.body.length-1][0], this.body[this.body.length-1][1] + cube]);
+					break;
+				case 37 : this.body.push([this.body[this.body.length-1][0] - cube, this.body[this.body.length-1][1]]);
+					break;
+				case 39 : this.body.push([this.body[snake1.body.length-1][0] + cube, this.body[this.body.length-1][1]]);
+					break;
+			}
+			this.body.shift();
+		}
+		this.IsDead = function()
+		{
+			for( i = 0; i < this.body.length - 2; ++i)
+				if( this.body[this.body.length - 1][0] == this.body[i][0] && this.body[this.body.length - 1][1] == this.body[i][1])
+					return true;    
+			return this.body[this.body.length - 1][0] >=0 || this.body[this.body.length - 1][0] >= canvas.width || this.body[this.body.length - 1][1] >=0 || this.body[this.body.length - 1][1] >= canvas.height; 
+		}
+	}
+	function genFood()
+	{
+		
+	}	
+	function draw()
+	{
+		context.clearRect(0, 0, canvas.width, canvas.height);
+		for( i = 0; i < snake1.length; i++)
+			context.fillRect(snake1[i][0], snake1[i][1], cube, cube);
+	}	
+	/*
 		var IsSingle = localStorage.getItem( 'player') == 'S' ? true : false, ip =  document.getElementById('ip').value, url, w, xx, yy, s1_x = 7, s1_y = 7, canvas = document.getElementById('snake'), cube = 7, context = canvas.getContext('2d'), s1_keycode = 39, s1_lastkey = s1_keycode, s1 = new Array([s1_x, s1_y], [s1_x += cube, s1_y], [s1_x += cube, s1_y], [s1_x += cube, s1_y]), s1_speed = 210;
+		
 		document.all['playerNum'][ IsSingle ? 0 : 1].checked = true;
 		document.all['mPlayer1'].style.visibility = document.all['mPlayer2'].style.visibility = document.all['mPlayer3'].style.visibility = (IsSingle?'hidden':'visiable');	
 		document.addEventListener("keydown", function(e) { s1_keycode = (Math.abs(s1_keycode - e.keyCode) == 2 || e.keyCode < 37 || e.keyCode > 40) ? s1_keycode : e.keyCode;}, false);
@@ -25,10 +66,15 @@
 			w.onerror = function(error){	alert( 'err');	}
 			w.onmessage = function(msg){	document.getElementById('chat_log').innerHTML += msg.data + "\n" ;	}
 		}
-		function send( ctrlCode)	{
-			ctrlCode == 'dummy' ? w.send( document.getElementById('chat').value) : w.send( "ready");		
+		function send()	{
+			w.send( document.all[ready].checked ? 'ready' : 'standby');
+			ctrlCode == 'dummy' ? w.send( document.getElementById('chat').value) : w.send( "ready");
+			if( IsSingle)
+				setTimeout( "chk_move_s1()", s1_speed), setInterval(draw,100), gen_food();
+			else
+				setTimeout( "send()", s1_speed), setInterval(draw,100), gen_food();		
 		}
-		setTimeout("chk_move_s1()", s1_speed), setInterval(draw,100), gen_food();
+
 		
 		function gen_food(){
 			while( is_over( xx = Math.round( (canvas.width/cube)*Math.random())*cube, yy = Math.round( (canvas.width/cube)*Math.random())*cube));
@@ -53,10 +99,18 @@
 			is_over( s1[s1.length-1][0], s1[s1.length-1][1]) ? (alert( "Game Over"), location.reload()): setTimeout("chk_move_s1()", s1_speed), ( !(s1[s1.length-1][0] == xx && s1[s1.length-1][1] == yy) ? s1.shift() : (( (s1_speed - 100) > 0?s1_speed-=20:gen_food()), gen_food()));
 		}
 		function draw(){
-			context.clearRect(0, 0, canvas.width, canvas.height);
-			for( i = 0; i < s1.length; i++)
-				context.fillRect(s1[i][0], s1[i][1], cube, cube);
-			context.fillRect( xx, yy, cube, cube);
+			if( IsSingle)
+			{
+				context.clearRect(0, 0, canvas.width, canvas.height);
+				for( i = 0; i < s1.length; i++)
+					context.fillRect(s1[i][0], s1[i][1], cube, cube);
+				context.fillRect( xx, yy, cube, cube);
+			}
+			else
+			{
+				
+			}
 		}
+		*/
 	</script>
 </html>
