@@ -32,7 +32,7 @@
 
 		<tr id = 'mPlayer1'>
 			<td>ClientID：
-			<input id="ClientID" type="text" value="Player" size="20"/>
+			<input id="ClientID" type="text" value="Player" size="5"/>
 			</td>
 		</tr>
 		<tr id = 'mPlayer2'>
@@ -134,7 +134,7 @@
 		function initSinglePlayer() {
 			strTableContent = "";
 			for( i = 0; i < document.getElementById('sNum').value; ++i)
-				strTableContent += "<tr><td width=15><input id='player" + (i + 1) + "' type='text' value='Player" + ( i + 1 )+ "'/><td><span class='swatch' style='background-color:" + arr_color[i] + "'></span></td><td></td></tr>";
+				strTableContent += "<tr><td width=15><input class='input-mini' id='player" + (i + 1) + "' size='2' type='text' value='Player" + ( i + 1 )+ "'></input><td width=7><span class='swatch' style='background-color:" + arr_color[i] + "'></span></td><td><input class='input-mini' id='ctrl_up" + (i+1) + "' size='2' type='text'/></input><input class='input-mini' id='ctrl_down" + (i+1) + "' type='text' size='2'/></input><input class='input-mini' size=2 id='ctrl_left" + (i+1) + "' type='text'></input><input class='input-mini' size=2 id='ctrl_right" + (i+1) + "' type='text'></input></td><td>123</td></tr>";
 			strTableAll = strTableHeader + strTableContent + strTableTailer;
 			document.getElementById('sPlayerInfo').innerHTML = strTableAll;
 		}
