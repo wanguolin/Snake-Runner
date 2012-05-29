@@ -137,10 +137,20 @@
 				strTableContent += "<tr><td width=15><input class='input-mini' id='player" + (i + 1) + "' size='2' type='text' value='Player" + ( i + 1 )+ "'></input><td width=7><span class='swatch' style='background-color:" + arr_color[i] + "'></span></td><td><input class='input-mini' id='ctrl_up" + (i+1) + "' size='2' type='text'/></input><input class='input-mini' id='ctrl_down" + (i+1) + "' type='text' size='2'/></input><input class='input-mini' size=2 id='ctrl_left" + (i+1) + "' type='text'></input><input class='input-mini' size=2 id='ctrl_right" + (i+1) + "' type='text'></input></td><td>123</td></tr>";
 			strTableAll = strTableHeader + strTableContent + strTableTailer;
 			document.getElementById('sPlayerInfo').innerHTML = strTableAll;
-			var test = document.createElement( "input");
-			test.type = "text";
-			test.value = 'test';
-			document.getElementById( "headTable").rows[i].cells[2].appendChild( test);
+			for( i = 1; i <= document.getElementById('sNum').value; ++i)
+			{
+				var inputPlayerName = document.createElement( "input"), ctrlUp = document.createElement( "input"), ctrlDown = document.createElement( "input"), ctrlLeft = document.createElement( "input"), ctrlRight = document.createElement( "input");
+				inputPlayerName.type = "text", inputPlayerName.value = inputPlayerName.id = "Player" + i;
+				document.getElementById( "headTable").rows[i].cells[0].appendChild( inputPlayerName);
+				ctrlUp.id = "ctrl_" + i + "P_up", ctrlDown.id = "ctrl_" + i + "P_down", ctrlLeft.id = "ctrl_" + i + "P_left", ctrlRight.id = "ctrl_" + i + "P_right";
+				ctrlUp.type = ctrlDown.type = ctrlLeft.type = ctrlRight.type = "text";
+				ctrlUp.className = ctrlDown.className = ctrlLeft.className = ctrlRight.className = "input-mini";
+				document.getElementById( "headTable").rows[i].cells[2].appendChild( ctrlUp);
+				document.getElementById( "headTable").rows[i].cells[2].appendChild( ctrlDown);
+				document.getElementById( "headTable").rows[i].cells[2].appendChild( ctrlLeft);
+				document.getElementById( "headTable").rows[i].cells[2].appendChild( ctrlRight);
+	
+			}
 		}
 
 		/*
