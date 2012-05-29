@@ -1,127 +1,200 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+	<head>
+		<link href="./css/bootstrap-responsive.css" rel="stylesheet">
+		<link href="./css/docs.css" rel="stylesheet">
+		<link href="./css/bootstrap.css" rel="stylesheet">
+	</head>
 	<meta charset="UTF-8">
 	<title>snake game</title>
+	<div id='sPlayerInfo'></div>
 	<table>
-		<tr> <td rowspan="13"><canvas id="snake" style="border: 1px solid;" width="777" height="777"></canvas></td></tr>
-		<tr> <td><input type=radio id= "playerNum" name="playerNum" VALUE="S" checked onclick="localStorage.setItem( 'player', 'S'), location.reload()">单人游戏</input> </td>
-		<tr> <td><input type=radio id= "playerNum" name="playerNum" VALUE="M" onclick="localStorage.setItem( 'player', 'M'), location.reload()" >多人游戏</td> </input>  <tr>
+		<tr>
+			<td rowspan="30"><canvas id="snake" style="border: 1px solid;" width="700" height="700"></canvas></td>
+		</tr>
+		<tr>
+			<td>
+				<input type=radio id= "playerNum" name="playerNum" VALUE="S" checked onclick="localStorage.setItem( 'player', 'S'), location.reload()">单机游戏
+				</input> 
+			</td>
+			
+			<tr>
+			<td><div class="control-group success">
+			<select id="sNum" name="sNum" onchange="initSinglePlayer()" >
+				<option value="0">请选择游戏人数</option><option value="1">1人</option><option value="2">2人</option><option value="3">3人</option><option value="4">4人</option><option value="5">5人</option><option value="6">6人</option>
+			</select></div></td></tr> 
+		</tr>
+		<tr>
+			<td>
+			<input type=radio id= "playerNum" name="playerNum" VALUE="M" onclick="localStorage.setItem( 'player', 'M'), location.reload()" >
+			联网</td> </input>
+		<tr>
 
-		<tr id = 'mPlayer1'> <td>ClientID：<input id="ClientID" type="text" value="Player" size="20"/></td></tr>
-		<tr id = 'mPlayer2'> <td>服务器IP地址：<input id="ip" type="text" value="127.0.0.1" size="10"/><input id="conn" name ="conn" type="button" value="连接" onclick="connect()"/></td></tr>
-		<tr id = 'mPlayer3'> <td><textarea id="chat_log" name="chat_log" cols="30" rows="5">服务器信息</textarea> </td> </tr>
-		<tr id = 'mPlayer4'> <td><input type="text" id="chat" onkeydown="javascript:event.keyCode==13?send():1" /> <input type="checkbox" id="ready" onclick="send()">Ready</>  </td></tr>
+		<tr id = 'mPlayer1'>
+			<td>ClientID：
+			<input id="ClientID" type="text" value="Player" size="20"/>
+			</td>
+		</tr>
+		<tr id = 'mPlayer2'>
+			<td>ServerIP：
+			<input id="ip" type="text" value="127.0.0.1" size="10"/>
+			<input id="conn" name ="conn" type="button" value="连接" onclick="connect()"/>
+			</td>
+		</tr>
+		<tr id = 'mPlayer3'>
+			<td>			<textarea id="chat_log" name="chat_log" cols="30" rows="5">服务器信息</textarea></td>
+		</tr>
+		<tr id = 'mPlayer4'>
+			<td>
+			<input type="text" id="chat" onkeydown="javascript:event.keyCode==13?send():1" />
+			<input type="checkbox" id="ready" onclick="send()">
+			Ready</> </td>
+		</tr>
+
+		<tr>
+			<td>
+			<input class='btn btn-primary' id='start' type="button" onclick="start()" value="开始游戏"/>
+			</td>
+		</tr>
 	</table>
-	
+
 	<script>
-	canvas = document.getElementById('snake');
-	context = canvas.getContext('2d');
-	document.addEventListener("keydown", function(e) { keyCode = (Math.abs(keyCode - e.keyCode) == 2 || e.keyCode < 37 || e.keyCode > 40) ? keyCode : e.keyCode;}, false);
-	var cube = x = y = 7, snake1 = new snake( x, y), i, keyCode = 39, xx,yy; 
-	genFood();
-	setTimeout( "_Move()", snake1.speed), setInterval(draw,100);		
-	function snake( x, y)
-	{
-		this.len = 3, this.body = new Array( [x,y], [x+cube, y], [x+2*cube, y]), this.color = "#000000", this.ready = false, this.speed = 210;
-		this.Move = function()
-		{
-			this.lastX = this.body[this.body.length-1][0], this.lastY = this.body[this.body.length-1][1];
-			switch( keyCode) 
-			{
-				case 38 : this.body.push([ this.lastX, this.lastY -= cube]);
-					break;
-				case 40 : this.body.push([ this.lastX, this,lastY += cube]);
-					break;
-				case 37 : this.body.push([ this.lastX -= cube, this.lastY]);
-					break;
-				case 39 : this.body.push([ this.lastX += cube, this.lastY]);
-					break;
-			}
-			this.body.shift();
-			IsDead( this.lastX, this.lastY) ? (alert( 'dead'), location.reload()) : 1;
-			setTimeout( "_Move()", snake1.speed);	
-		};
-	}
-	function IsDead( head_x, head_y){
-		for( i = 0; i < snake1.body.length - 2; i++)
-			if( head_x == snake1.body[i][0] && head_y == snake1.body[i][1])
-				return true;
-		return ( head_y <= 0 || head_y >= canvas.width || head_y <= 0 || head_y >= canvas.height) ? true : false;
-	}
-	function genFood()
-	{
-		xx = Math.round( canvas.width*Math.random());
-		yy = Math.round( canvas.height*Math.random());
-	}	
-	function _Move()
-	{
-		snake1.Move();
-	}
-	function draw()
-	{
-		context.clearRect(0, 0, canvas.width, canvas.height);
-		for( i = 0; i < snake1.len - 1; i++)
-			context.fillRect(snake1.body[i][0], snake1.body[i][1], cube, cube);
-		context.fillRect( xx, yy, cube, cube);
-	}	
-	/*
-		var IsSingle = localStorage.getItem( 'player') == 'S' ? true : false, ip =  document.getElementById('ip').value, url, w, xx, yy, s1_x = 7, s1_y = 7, canvas = document.getElementById('snake'), cube = 7, context = canvas.getContext('2d'), s1_keycode = 39, s1_lastkey = s1_keycode, s1 = new Array([s1_x, s1_y], [s1_x += cube, s1_y], [s1_x += cube, s1_y], [s1_x += cube, s1_y]), s1_speed = 210;
-		
-		document.all['playerNum'][ IsSingle ? 0 : 1].checked = true;
-		document.all['mPlayer1'].style.visibility = document.all['mPlayer2'].style.visibility = document.all['mPlayer3'].style.visibility = (IsSingle?'hidden':'visiable');	
-		
-	
-		function connect(){
-			url = 'ws://'+ ip + ':8080/';
-			w = new WebSocket( url);
-			w.onerror = function(error){	alert( 'err');	}
-			w.onmessage = function(msg){	document.getElementById('chat_log').innerHTML += msg.data + "\n" ;	}
-		}
-		function send()	{
-			w.send( document.all[ready].checked ? 'ready' : 'standby');
-			ctrlCode == 'dummy' ? w.send( document.getElementById('chat').value) : w.send( "ready");
-			if( IsSingle)
-				setTimeout( "chk_move_s1()", s1_speed), setInterval(draw,100), gen_food();
-			else
-				setTimeout( "send()", s1_speed), setInterval(draw,100), gen_food();		
+		canvas = document.getElementById('snake');
+		context = canvas.getContext('2d');
+		document.addEventListener("keydown", function(e) {
+			keyCode = (Math.abs(keyCode - e.keyCode) == 2 || e.keyCode < 37 || e.keyCode > 40) ? keyCode : e.keyCode;
+		}, false);
+		var cube = x = y = 7, snake1 = new snake(x, y, 39), i, keyCode = 39, xx, yy, strTableHeader = "<table class='table table-striped'><thead><tr><th>玩家姓名</th><th>颜色</th><th>控制键:↑ ↓←→</th><th>得分</th></tr></thead>", strTableTailer = "</table>", strTableContent, strTableAll, arr_color = new Array(["#049cdb"], ["#46a546"], ["#9d261d"], ["#ffc40d"], ["#f89406"], ["#c3325f"] , ["#7a43b6"]);
+		genFood();
+		setInterval(draw, 100);
+		function start() {
+			setTimeout("_Move()", snake1.speed);
 		}
 
-		
-		function gen_food(){
-			while( is_over( xx = Math.round( (canvas.width/cube)*Math.random())*cube, yy = Math.round( (canvas.width/cube)*Math.random())*cube));
+		function snake(x, y, direction, player_color) {
+			this.len = 3, this.body = new Array([x, y], [x + cube, y], [x + 2 * cube, y]), this.color = player_color, this.ready = false, this.speed = 210, this.lastKey = direction, this.name;
+			this.Move = function() {
+				this.lastX = this.body[this.body.length-1][0];
+				this.lastY = this.body[this.body.length-1][1];
+				switch( this.lastKey) {
+					case 38 :
+						this.body.push([this.lastX, this.lastY - cube]);
+						break;
+					case 40 :
+						this.body.push([this.lastX, this.lastY + cube]);
+						break;
+					case 37 :
+						this.body.push([this.lastX - cube, this.lastY]);
+						break;
+					case 39 :
+						this.body.push([this.lastX + cube, this.lastY]);
+						break;
+					default:
+						this.lastKey = keyCode;
+
+				}
+				this.lastX = this.body[this.body.length-1][0];
+				this.lastY = this.body[this.body.length-1][1];
+
+				IsDead(this.lastX, this.lastY) ? (alert('dead'), location.reload()) : 1;
+				if(this.lastX == xx && this.lastY == yy) {
+					genFood();
+					//alert( 's');
+				} else {
+					this.body.shift();
+				}
+
+				setTimeout("_Move()", snake1.speed);
+			};
 		}
-		function is_over( x, y){
-			for( i = 0; i < s1.length - 1; i++)
-				if( x == s1[i][0] && y == s1[i][1])
+
+		function IsDead(head_x, head_y) {
+			for( i = 0; i < snake1.body.length - 2; i++)
+				if(head_x == snake1.body[i][0] && head_y == snake1.body[i][1])
 					return true;
-			return ( x == 0 || x == canvas.width || y == 0 || y == canvas.height)? true : false;
+			return (head_y <= 0 || head_y >= canvas.width || head_y <= 0 || head_y >= canvas.height) ? true : false;
 		}
-		function chk_move_s1() {
-			switch( s1_keycode) {
-				case 38 : s1.push([s1[s1.length-1][0], s1[s1.length-1][1] - cube]);
-					break;
-				case 40 : s1.push([s1[s1.length-1][0], s1[s1.length-1][1] + cube]);
-					break;
-				case 37 : s1.push([s1[s1.length-1][0] - cube, s1[s1.length-1][1]]);
-					break;
-				case 39 : s1.push([s1[s1.length-1][0] + cube, s1[s1.length-1][1]]);
-					break;
-			}
-			is_over( s1[s1.length-1][0], s1[s1.length-1][1]) ? (alert( "Game Over"), location.reload()): setTimeout("chk_move_s1()", s1_speed), ( !(s1[s1.length-1][0] == xx && s1[s1.length-1][1] == yy) ? s1.shift() : (( (s1_speed - 100) > 0?s1_speed-=20:gen_food()), gen_food()));
+
+		function genFood() {
+			xx = Math.round((canvas.width / cube) * Math.random()) * cube;
+			yy = Math.round((canvas.height / cube) * Math.random()) * cube;
 		}
-		function draw(){
-			if( IsSingle)
-			{
-				context.clearRect(0, 0, canvas.width, canvas.height);
-				for( i = 0; i < s1.length; i++)
-					context.fillRect(s1[i][0], s1[i][1], cube, cube);
-				context.fillRect( xx, yy, cube, cube);
-			}
-			else
-			{
-				
-			}
+
+		function _Move() {
+			snake1.Move();
 		}
-		*/
+
+		function draw() {
+			context.clearRect(0, 0, canvas.width, canvas.height);
+			for( i = 0; i < snake1.body.length - 1; i++)
+				context.fillRect(snake1.body[i][0], snake1.body[i][1], cube, cube);
+			context.fillRect(xx, yy, cube, cube);
+		}
+
+		function initSinglePlayer() {
+			strTableContent = "";
+			for( i = 0; i < document.getElementById('sNum').value; ++i)
+				strTableContent += "<tr><td width=15><input id='player" + (i + 1) + "' type='text' value='Player" + ( i + 1 )+ "'/><td><span class='swatch' style='background-color:" + arr_color[i] + "'></span></td><td></td></tr>";
+			strTableAll = strTableHeader + strTableContent + strTableTailer;
+			document.getElementById('sPlayerInfo').innerHTML = strTableAll;
+		}
+
+		/*
+		 var IsSingle = localStorage.getItem( 'player') == 'S' ? true : false, ip =  document.getElementById('ip').value, url, w, xx, yy, s1_x = 7, s1_y = 7, canvas = document.getElementById('snake'), cube = 7, context = canvas.getContext('2d'), s1_keycode = 39, s1_lastkey = s1_keycode, s1 = new Array([s1_x, s1_y], [s1_x += cube, s1_y], [s1_x += cube, s1_y], [s1_x += cube, s1_y]), s1_speed = 210;
+
+		 document.all['playerNum'][ IsSingle ? 0 : 1].checked = true;
+		 document.all['mPlayer1'].style.visibility = document.all['mPlayer2'].style.visibility = document.all['mPlayer3'].style.visibility = (IsSingle?'hidden':'visiable');
+
+		 function connect(){
+		 url = 'ws://'+ ip + ':8080/';
+		 w = new WebSocket( url);
+		 w.onerror = function(error){	alert( 'err');	}
+		 w.onmessage = function(msg){	document.getElementById('chat_log').innerHTML += msg.data + "\n" ;	}
+		 }
+		 function send()	{
+		 w.send( document.all[ready].checked ? 'ready' : 'standby');
+		 ctrlCode == 'dummy' ? w.send( document.getElementById('chat').value) : w.send( "ready");
+		 if( IsSingle)
+		 setTimeout( "chk_move_s1()", s1_speed), setInterval(draw,100), gen_food();
+		 else
+		 setTimeout( "send()", s1_speed), setInterval(draw,100), gen_food();
+		 }
+
+		 function gen_food(){
+		 while( is_over( xx = Math.round( (canvas.width/cube)*Math.random())*cube, yy = Math.round( (canvas.width/cube)*Math.random())*cube));
+		 }
+		 function is_over( x, y){
+		 for( i = 0; i < s1.length - 1; i++)
+		 if( x == s1[i][0] && y == s1[i][1])
+		 return true;
+		 return ( x == 0 || x == canvas.width || y == 0 || y == canvas.height)? true : false;
+		 }
+		 function chk_move_s1() {
+		 switch( s1_keycode) {
+		 case 38 : s1.push([s1[s1.length-1][0], s1[s1.length-1][1] - cube]);
+		 break;
+		 case 40 : s1.push([s1[s1.length-1][0], s1[s1.length-1][1] + cube]);
+		 break;
+		 case 37 : s1.push([s1[s1.length-1][0] - cube, s1[s1.length-1][1]]);
+		 break;
+		 case 39 : s1.push([s1[s1.length-1][0] + cube, s1[s1.length-1][1]]);
+		 break;
+		 }
+		 is_over( s1[s1.length-1][0], s1[s1.length-1][1]) ? (alert( "Game Over"), location.reload()): setTimeout("chk_move_s1()", s1_speed), ( !(s1[s1.length-1][0] == xx && s1[s1.length-1][1] == yy) ? s1.shift() : (( (s1_speed - 100) > 0?s1_speed-=20:gen_food()), gen_food()));
+		 }
+		 function draw(){
+		 if( IsSingle)
+		 {
+		 context.clearRect(0, 0, canvas.width, canvas.height);
+		 for( i = 0; i < s1.length; i++)
+		 context.fillRect(s1[i][0], s1[i][1], cube, cube);
+		 context.fillRect( xx, yy, cube, cube);
+		 }
+		 else
+		 {
+
+		 }
+		 }
+		 */
 	</script>
 </html>
