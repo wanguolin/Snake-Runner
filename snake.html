@@ -64,7 +64,7 @@
 		document.addEventListener("keydown", function(e) {
 			keyCode = (Math.abs(keyCode - e.keyCode) == 2 || e.keyCode < 37 || e.keyCode > 40) ? keyCode : e.keyCode;
 		}, false);
-		var cube = x = y = 7, snake1 = new snake(x, y, 39), i, keyCode = 39, xx, yy, strTableHeader = "<table class='table table-striped'><thead><tr><th>玩家姓名</th><th>颜色</th><th>控制键:↑ ↓←→</th><th>得分</th></tr></thead>", strTableTailer = "</table>", strTableContent, strTableAll, arr_color = new Array(["#049cdb"], ["#46a546"], ["#9d261d"], ["#ffc40d"], ["#f89406"], ["#c3325f"] , ["#7a43b6"]);
+		var cube = x = y = 7, snake1 = new snake(x, y, 39), i, keyCode = 39, xx, yy, strTableHeader = "<table id='headTable' class='table table-striped'><thead><tr><th>玩家姓名</th><th>颜色</th><th>控制键:↑ ↓←→</th><th>得分</th></tr></thead>", strTableTailer = "</table>", strTableContent, strTableAll, arr_color = new Array(["#049cdb"], ["#46a546"], ["#9d261d"], ["#ffc40d"], ["#f89406"], ["#c3325f"] , ["#7a43b6"]);
 		genFood();
 		setInterval(draw, 100);
 		function start() {
@@ -137,6 +137,10 @@
 				strTableContent += "<tr><td width=15><input class='input-mini' id='player" + (i + 1) + "' size='2' type='text' value='Player" + ( i + 1 )+ "'></input><td width=7><span class='swatch' style='background-color:" + arr_color[i] + "'></span></td><td><input class='input-mini' id='ctrl_up" + (i+1) + "' size='2' type='text'/></input><input class='input-mini' id='ctrl_down" + (i+1) + "' type='text' size='2'/></input><input class='input-mini' size=2 id='ctrl_left" + (i+1) + "' type='text'></input><input class='input-mini' size=2 id='ctrl_right" + (i+1) + "' type='text'></input></td><td>123</td></tr>";
 			strTableAll = strTableHeader + strTableContent + strTableTailer;
 			document.getElementById('sPlayerInfo').innerHTML = strTableAll;
+			var test = document.createElement( "input");
+			test.type = "text";
+			test.value = 'test';
+			document.getElementById( "headTable").rows[i].cells[2].appendChild( test);
 		}
 
 		/*
