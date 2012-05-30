@@ -69,13 +69,14 @@
 		window.objTimerID = [];
 
 		function start() {
-			all_snakes[0].Move();
+			for( var i = 0; i < all_snakes.length; ++i)
+				all_snakes[i].Move();
 			//window.objTimerID[0] = setTimeout( bind( all_snakes[0], all_snakes[0].Move, 1000);//, this.speed);all_snakes[0].Move();
 		}
 
 		function objTimer( obj, func, time, index){
 			window.objTimerFunc[index] = function(){ func.call( obj); }
-			window.objTimerID[index]   =  setTimeout("objTimerFunc['"+ index + "']()",500);
+			setTimeout("objTimerFunc['"+ index + "']()",500);
 		}
 
 		function snake(x, y, direction, player_color, _index) {
@@ -87,11 +88,7 @@
 				this.lastX = this.body[this.body.length-1][0];
 				this.lastY = this.body[this.body.length-1][1];
 				this.body.shift();
-				//IsDead(this.lastX, this.lastY) ? (alert('dead'), location.reload()) : 1;
-				
-				//clearTimeout( window.objTimerID[_index]);
 				window.objTimerID = objTimer( this, this.Move, 500, _index);
-
 			};
 
 
@@ -120,31 +117,38 @@
 
 		function initSinglePlayer() {
 			strTableContent = "", k = 0, all_snakes = [], x = y = 7;
-			for( i = 0; i < document.getElementById('sNum').value; ++i)
+			for( var i = 0; i < document.getElementById('sNum').value; ++i)
 			{
 				strTableContent += "<tr><td></td><td width=7><span class='swatch' style='background-color:" + arr_color[i] + "'></span></td><td></td><td>123</td></tr>";
-				all_snakes.push( new snake( x, y += 42, 3, arr_color[i]), i);
+				all_snakes.push( new snake( x, y += 42, 3, arr_color[i], i));
 			}
 			strTableAll = strTableHeader + strTableContent + strTableTailer;
 			document.getElementById('sPlayerInfo').innerHTML = strTableAll;
-			for( i = 0; i < document.getElementById('sNum').value; ++i)
+			for( var i = 0; i < document.getElementById('sNum').value; ++i)
 			{
 				var _tmp = document.getElementById( "headTable"), _tmpInput = document.createElement( "input");
 				_tmpInput.type = "text", _tmpInput.value = _tmpInput.id = "Player" + i;
 				_tmp.rows[i + 1].cells[0].appendChild( _tmpInput);
 				for( j = 0; j < 4; ++j)
-					_tmpInput = document.createElement( "input"), _tmpInput.tabIndex = _tmpInput.id = ++k, _tmpInput.type = "text", _tmpInput.className = "input-mini", _tmpInput.addEventListener("keydown", function(e){ document.getElementById( e.target.id).value = e.keyCode; document.getElementById( parseInt( e.target.id) + 1).focus();}, false), _tmp.rows[i + 1].cells[2].appendChild( _tmpInput), all_snakes[i].btnCtrl.push( document.createElement( "input"));
+				{
+					_tmpInput = document.createElement( "input");
+					_tmpInput.tabIndex = _tmpInput.id = ++k, _tmpInput.type = "text", _tmpInput.className = "input-mini";
+					_tmpInput.addEventListener("keydown", function(e){ document.getElementById( e.target.id).value = e.keyCode; document.getElementById( parseInt( e.target.id) + 1).focus();}, false);
+					_tmp.rows[i + 1].cells[2].appendChild( _tmpInput);
+					all_snakes[i].btnCtrl.push( _tmpInput);
+					
+				}
 					//all_snakes[i].btnCtrl.push( document.createElement( "input")), all_snakes[i].btnCtrl[j].tabIndex = k, all_snakes[i].btnCtrl[j].type = "text", all_snakes[i].btnCtrl[j].id = "ctrl_" + i + "P_" + j, all_snakes[i].btnCtrl[j].className = "input-mini", all_snakes[i].btnCtrl[j].addEventListener("keydown", function(e){ document.getElementById(( e.target.id)).value = e.keyCode; }, false), _tmp.rows[i + 1].cells[2].appendChild( all_snakes[i].btnCtrl[j]);
 			}
 		}
 
 		function DispatchToAll( e)
 		{
-			for( i = 0; i < all_snakes.length; ++i)
-				for( j = 0; j < 4; ++j)
+			for( var i = 0; i < all_snakes.length; ++i)
+				for( var j = 0; j < 4; ++j)
 					if( (k = all_snakes[i].lastIndex), all_snakes[i].btnCtrl[j].value == ( l = e.keyCode))
-						if(( k == 0 && l == 1) || ( k == 1 && l == 0) || ( k == 2 && l ==3) || ( k == 3 && l == 2))
-							all_snakes[i].lastIndex = j;
+						if(!( k == 0 && l == 1) || ( k == 1 && l == 0) || ( k == 2 && l ==3) || ( k == 3 && l == 2))
+							all_snakes[i].curIndex = j;
 		}
 
 	</script>
