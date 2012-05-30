@@ -59,45 +59,50 @@
 	</table>
 
 	<script>
-		var all_snakes = new Array(), arr_ctrl_all = new Array( [0, -cube], [0, cube], [-cube, 0], [cube, 0] );
-		canvas = document.getElementById('snake');
-		context = canvas.getContext('2d');
-		document.addEventListener("keydown", function(e) {
-			keyCode = (Math.abs(keyCode - e.keyCode) == 2 || e.keyCode < 37 || e.keyCode > 40) ? keyCode : e.keyCode;
-		}, false);
+		var canvas = document.getElementById('snake'), context = canvas.getContext('2d');
+		document.addEventListener("keydown", DispatchToAll, false);
 		var cube = x = y = 7, i, j, k, l, keyCode = 39, xx, yy, strTableHeader = "<table id='headTable' class='table table-striped'><thead><tr><th>玩家姓名</th><th>颜色</th><th>控制键:↑ ↓←→</th><th>得分</th></tr></thead>", strTableTailer = "</table>", strTableContent = "", strTableAll, arr_color = new Array(["#049cdb"], ["#46a546"], ["#9d261d"], ["#ffc40d"], ["#f89406"], ["#c3325f"] , ["#7a43b6"]);
+		var all_snakes = new Array(), arr_ctrl_all = new Array( [0, -cube], [0, cube], [-cube, 0], [cube, 0] ), indexFoodColor = 0;
 		genFood();
 		setInterval(draw, 100);
+		window.objTimerFunc = [];
+		window.objTimerID = [];
+
 		function start() {
-			setTimeout("_Move()", snake1.speed);
+			all_snakes[0].Move();
+			//window.objTimerID[0] = setTimeout( bind( all_snakes[0], all_snakes[0].Move, 1000);//, this.speed);all_snakes[0].Move();
 		}
 
-		function snake(x, y, direction, player_color) {
-			this.len = 3, this.body = new Array([x, y], [x + cube, y], [x + 2 * cube, y]), this.color = player_color, this.ready = false, this.speed = 210, this.curIndex = direction, this.lastIndex, this.name, this.btnCtrl = new Array();
+		function objTimer( obj, func, time, index){
+			window.objTimerFunc[index] = function(){ func.call( obj); }
+			window.objTimerID[index]   =  setTimeout("objTimerFunc['"+ index + "']()",500);
+		}
+
+		function snake(x, y, direction, player_color, _index) {
+			this.len = 3, this.body = new Array([x, y], [x + cube, y], [x + 2 * cube, y]), this.color = player_color, this.ready = false, this.speed = 1000, this.curIndex = direction, this.lastIndex, this.name, this.btnCtrl = new Array();
 			this.Move = function() {
 				this.lastX = this.body[this.body.length-1][0];
 				this.lastY = this.body[this.body.length-1][1];
-				this.body.push( [this.lastX + arr_ctrl_all[this.curIndex][0], this.lastY + arr_ctrl_all[this.curIndex[1]]);
+				this.body.push( [this.lastX + arr_ctrl_all[this.curIndex][0], this.lastY + arr_ctrl_all[this.curIndex][1]]);
 				this.lastX = this.body[this.body.length-1][0];
 				this.lastY = this.body[this.body.length-1][1];
+				this.body.shift();
+				//IsDead(this.lastX, this.lastY) ? (alert('dead'), location.reload()) : 1;
+				
+				//clearTimeout( window.objTimerID[_index]);
+				window.objTimerID = objTimer( this, this.Move, 500, _index);
 
-				IsDead(this.lastX, this.lastY) ? (alert('dead'), location.reload()) : 1;
-				if(this.lastX == xx && this.lastY == yy) {
-					genFood();
-					//alert( 's');
-				} else {
-					this.body.shift();
-				}
-
-				setTimeout("_Move()", snake1.speed);
 			};
+
+
 		}
 
 		function IsDead(head_x, head_y) {
-			for( i = 0; i < snake1.body.length - 2; i++)
-				if(head_x == snake1.body[i][0] && head_y == snake1.body[i][1])
-					return true;
-			return (head_y <= 0 || head_y >= canvas.width || head_y <= 0 || head_y >= canvas.height) ? true : false;
+			for( i = 0; i < all_snakes.length; ++i)
+				for( j = 0; j < all_snakes[i].body.length - 2; ++j)
+					if(head_x == all_snakes[i].body[j][0] && head_y == all_snakes[i].body[j][1])
+						return true;
+			return (head_x <= 0 || head_x >= canvas.width || head_y <= 0 || head_y >= canvas.height) ? true : false;
 		}
 
 		function genFood() {
@@ -105,33 +110,31 @@
 			yy = Math.round((canvas.height / cube) * Math.random()) * cube;
 		}
 
-		function _Move() {
-			//snake1.Move();
-		}
-
-		function draw() {/*
+		function draw() {
 			context.clearRect(0, 0, canvas.width, canvas.height);
-			for( i = 0; i < snake1.body.length - 1; i++)
-				context.fillRect(snake1.body[i][0], snake1.body[i][1], cube, cube);
-			context.fillRect(xx, yy, cube, cube);*/
+			for( i = 0; i < all_snakes.length; ++i)
+				for( j = 0; j < all_snakes[i].body.length; ++j)
+					context.fillStyle = arr_color[i][0], context.fillRect(all_snakes[i].body[j][0], all_snakes[i].body[j][1], cube, cube);
+			context.fillRect(xx, yy, cube, cube);
 		}
 
 		function initSinglePlayer() {
-			strTableContent = "";
+			strTableContent = "", k = 0, all_snakes = [], x = y = 7;
 			for( i = 0; i < document.getElementById('sNum').value; ++i)
 			{
 				strTableContent += "<tr><td></td><td width=7><span class='swatch' style='background-color:" + arr_color[i] + "'></span></td><td></td><td>123</td></tr>";
-				all_snakes.push( new snake( x, y += 7, 39));
+				all_snakes.push( new snake( x, y += 42, 3, arr_color[i]), i);
 			}
 			strTableAll = strTableHeader + strTableContent + strTableTailer;
 			document.getElementById('sPlayerInfo').innerHTML = strTableAll;
 			for( i = 0; i < document.getElementById('sNum').value; ++i)
 			{
-				var _tmp = document.getElementById( "headTable"), inputPlayerName = document.createElement( "input");
-				inputPlayerName.type = "text", inputPlayerName.value = inputPlayerName.id = "Player" + i;
-				_tmp.rows[i + 1].cells[0].appendChild( inputPlayerName);
+				var _tmp = document.getElementById( "headTable"), _tmpInput = document.createElement( "input");
+				_tmpInput.type = "text", _tmpInput.value = _tmpInput.id = "Player" + i;
+				_tmp.rows[i + 1].cells[0].appendChild( _tmpInput);
 				for( j = 0; j < 4; ++j)
-					all_snakes[i].btnCtrl.push( document.createElement( "input")), all_snakes[i].btnCtrl[j].type = "text", all_snakes[i].btnCtrl[j].id = "ctrl_" + i + "P_" + j, all_snakes[i].btnCtrl[j].className = "input-mini", all_snakes[i].btnCtrl[j].addEventListener("keydown", function(e){ document.getElementById(( e.target.id)).value = e.keyCode;; }, false), _tmp.rows[i + 1].cells[2].appendChild( all_snakes[i].btnCtrl[j]);
+					_tmpInput = document.createElement( "input"), _tmpInput.tabIndex = _tmpInput.id = ++k, _tmpInput.type = "text", _tmpInput.className = "input-mini", _tmpInput.addEventListener("keydown", function(e){ document.getElementById( e.target.id).value = e.keyCode; document.getElementById( parseInt( e.target.id) + 1).focus();}, false), _tmp.rows[i + 1].cells[2].appendChild( _tmpInput), all_snakes[i].btnCtrl.push( document.createElement( "input"));
+					//all_snakes[i].btnCtrl.push( document.createElement( "input")), all_snakes[i].btnCtrl[j].tabIndex = k, all_snakes[i].btnCtrl[j].type = "text", all_snakes[i].btnCtrl[j].id = "ctrl_" + i + "P_" + j, all_snakes[i].btnCtrl[j].className = "input-mini", all_snakes[i].btnCtrl[j].addEventListener("keydown", function(e){ document.getElementById(( e.target.id)).value = e.keyCode; }, false), _tmp.rows[i + 1].cells[2].appendChild( all_snakes[i].btnCtrl[j]);
 			}
 		}
 
@@ -140,7 +143,7 @@
 			for( i = 0; i < all_snakes.length; ++i)
 				for( j = 0; j < 4; ++j)
 					if( (k = all_snakes[i].lastIndex), all_snakes[i].btnCtrl[j].value == ( l = e.keyCode))
-						if( k == 0 && l == 1) || ( k == 1 && l == 0) || ( k == 2 && l ==3) || ( k == 3 && l == 2)
+						if(( k == 0 && l == 1) || ( k == 1 && l == 0) || ( k == 2 && l ==3) || ( k == 3 && l == 2))
 							all_snakes[i].lastIndex = j;
 		}
 
