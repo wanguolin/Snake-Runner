@@ -60,7 +60,6 @@
 
 	<script>
 		var canvas = document.getElementById('snake'), context = canvas.getContext('2d');
-		document.addEventListener("keydown", DispatchToAll, false);
 		var cube = x = y = 7, i, j, k, l, keyCode = 39, xx, yy, strTableHeader = "<table id='headTable' class='table table-striped'><thead><tr><th>玩家姓名</th><th>颜色</th><th>控制键:↑ ↓←→</th><th>总分</th></tr></thead>", strTableTailer = "</table>", strTableContent = "", strTableAll, arr_color = new Array(["#049cdb"], ["#46a546"], ["#9d261d"], ["#ffc40d"], ["#f89406"], ["#c3325f"] , ["#7a43b6"]);
 		var all_snakes = new Array(), arr_ctrl_all = new Array( [0, -cube], [0, cube], [-cube, 0], [cube, 0] ), indexFoodColor = 0;
 		genFood();
@@ -69,6 +68,7 @@
 		window.objTimerID = [];
 
 		function start() {
+			document.addEventListener("keydown", DispatchToAll, false);
 			for( var i = 0; i < all_snakes.length; ++i)
 				all_snakes[i].Move();
 		}
@@ -141,21 +141,25 @@
 				for( j = 0; j < 4; ++j)
 				{
 					_tmpInput = document.createElement( "input");
-					_tmpInput.tabIndex = _tmpInput.id = ++k, _tmpInput.type = "text", _tmpInput.className = "input-mini";
-					_tmpInput.addEventListener("keydown", function(e){ document.getElementById( e.target.id).value = e.keyCode; document.getElementById( parseInt( e.target.id) + 1).focus();}, false);
+					_tmpInput.tabIndex = _tmpInput.id = ++k, _tmpInput.type = "text", _tmpInput.className = "input-mini", _tmpInput.readOnly = "true";
+					_tmpInput.addEventListener("keydown", function(e){ 
+						if( parseInt( document.getElementById( 'sNum').value) * 4 !=  parseInt(e.target.id))
+							document.getElementById( parseInt(e.target.id) + 1).focus();
+						document.getElementById( parseInt(e.target.id)).value = e.keyCode; 
+						}, true);
 					_tmp.rows[i + 1].cells[2].appendChild( _tmpInput);
 					all_snakes[i].btnCtrl.push( _tmpInput);
 				}
 			}
 		}
-
+ 
 		function DispatchToAll( e)
 		{
 			for( var i = 0; i < all_snakes.length; ++i)
 				for( var j = 0; j < 4; ++j)
 					if( (k = all_snakes[i].lastIndex), all_snakes[i].btnCtrl[j].value == ( l = e.keyCode))
-						if(!( k == 0 && l == 1) || ( k == 1 && l == 0) || ( k == 2 && l ==3) || ( k == 3 && l == 2))
-							all_snakes[i].curIndex = j;
+						if(!(( k == 0 && l == 1) || ( k == 1 && l == 0) || ( k == 2 && l ==3) || ( k == 3 && l == 2)))
+							all_snakes[i].lastIndex = all_snakes[i].curIndex, all_snakes[i].curIndex = j;
 		}
 
 	</script>
