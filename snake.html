@@ -10,11 +10,11 @@
 	<div id='sPlayerInfo'></div>
 	<table>
 		<tr>
-			<td rowspan="30"><canvas id="snake" style="border: 1px solid;" width="700" height="700"></canvas></td>
+			<td rowspan="30"><canvas id="snake" style="border: 1px solid;" width="420" height="420"></canvas></td>
 		</tr>
 		<tr>
 			<td>
-				<input type=radio id= "playerNum" name="playerNum" VALUE="S" checked onclick="localStorage.setItem( 'player', 'S'), location.reload()">单机游戏
+				<input type=radio id= "playerNum" name="playerNum" VALUE="S" checked onclick="">单机游戏
 				</input> 
 			</td>
 			
@@ -26,7 +26,7 @@
 		</tr>
 		<tr>
 			<td>
-			<input type=radio id= "playerNum" name="playerNum" VALUE="M" onclick="localStorage.setItem( 'player', 'M'), location.reload()" >
+			<input type=radio id= "playerNum" name="playerNum" VALUE="M" onclick=" initMultiPlayer()" >
 			联网</td> </input>
 		<tr>
 
@@ -37,8 +37,8 @@
 		</tr>
 		<tr id = 'mPlayer2'>
 			<td>ServerIP：
-			<input id="ip" type="text" value="127.0.0.1" size="10"/>
-			<input id="conn" name ="conn" type="button" value="连接" onclick="connect()"/>
+			<input id="ip" type="text" value="192.168.1.104" size="10"/>
+			<input id="conn" name ="conn" type="button" value="连接" onclick="initMultiPlayer()"/>
 			</td>
 		</tr>
 		<tr id = 'mPlayer3'>
@@ -59,17 +59,19 @@
 	</table>
 
 	<script>
-	    var canvas = document.getElementById('snake'), context = canvas.getContext('2d');
-	    var cube = x = y = 7, i, j, k, l, keyCode = 39, xx, yy, strTableHeader = "<table id='headTable' class='table table-striped'><thead><tr><th>玩家姓名</th><th>颜色</th><th>控制键:↑ ↓←→</th><th>总分</th></tr></thead>", strTableTailer = "</table>", strTableContent = "", strTableAll, arr_color = new Array(["#049cdb"], ["#46a546"], ["#9d261d"], ["#ffc40d"], ["#f89406"], ["#c3325f"], ["#7a43b6"]);
-	    var all_snakes = new Array(), arr_ctrl_all = new Array([0, -cube], [0, cube], [-cube, 0], [cube, 0]), indexFoodColor = 0;
+	    var canvas = document.getElementById('snake'), context = canvas.getContext('2d'), cube = x = y = 7, i, j, k, l, keyCode = 39, xx, yy, strTableHeader = "<table id='headTable' class='table table-striped'><thead><tr><th>玩家姓名</th><th>颜色</th><th>控制键:↑ ↓←→</th><th>总分</th></tr></thead>", strTableTailer = "</table>", strTableContent = "", strTableAll, arr_color = new Array(["#049cdb"], ["#46a546"], ["#9d261d"], ["#ffc40d"], ["#f89406"], ["#c3325f"], ["#7a43b6"]), all_snakes = new Array(), arr_ctrl_all = new Array([0, -cube], [0, cube], [-cube, 0], [cube, 0]), indexFoodColor = 0, ws, rcvNewSnakeIndex = 0, all_remote_snake = new Array(), bln_multi = false;
+	    window.objTimerFunc = [], window.objTimerID = [], window.global_key_ctrl = new Array(), 
 	    genFood();
 	    setInterval(draw, 50);
-	    window.objTimerFunc = [];
-	    window.objTimerID = [];
-	    window.global_key_ctrl = new Array();
-
+	    
 	    function start() {
-	        document.addEventListener("keydown", DispatchToAll, false);
+	        document.addEventListener("keydown", function DispatchToAll(e) {
+	                if (global_key_ctrl[e.keyCode] != undefined) {
+	                    var snake_num = (global_key_ctrl[e.keyCode] - (global_key_ctrl[e.keyCode]) % 4) / 4, cur_index = (global_key_ctrl[e.keyCode]) % 4;
+	                    if (!((arr_ctrl_all[all_snakes[snake_num].curIndex][0] + arr_ctrl_all[cur_index][0] == 0) && (arr_ctrl_all[all_snakes[snake_num].curIndex][1] + arr_ctrl_all[cur_index][1] == 0)))
+	                        all_snakes[snake_num].lastIndex = all_snakes[snake_num].curIndex, all_snakes[snake_num].curIndex = cur_index;
+	                }
+	        }, false);
 	        for (var i = 0; i < all_snakes.length; ++i)
 	            all_snakes[i].Move();
 	    }
@@ -82,23 +84,9 @@
 	    function snake(x, y, direction, player_color, _index) {
 	        this.len = 3, this.body = new Array([x, y], [x + cube, y], [x + 2 * cube, y]), this.color = player_color, this.ready = false, this.speed = 200, this.lastIndex = this.curIndex = direction, this.name, this.btnCtrl = new Array(), this.score = 0;
 	        this.Move = function () {
-	            this.lastX = this.body[this.body.length - 1][0];
-	            this.lastY = this.body[this.body.length - 1][1];
-	            this.IsDead = IsDead(this.lastX, this.lastY);
-	            this.body.push([this.lastX + arr_ctrl_all[this.curIndex][0], this.lastY + arr_ctrl_all[this.curIndex][1]]);
-	            if (this.IsDead) {
-	                alert('Game Over');
-	                location.reload();
-	            }
-	            else {
-	                if (this.lastX == xx && this.lastY == yy) {
-	                    document.getElementById("score" + _index).innerHTML = (this.score += 10), genFood();
-	                    localStorage.setItem("score" + _index, this.score);
-	                }
-	                else
-	                    this.body.shift();
-	            }
-
+	            this.IsDead = IsDead(this.body[this.body.length - 1][0], this.body[this.body.length - 1][1]);
+	            this.body.push([this.body[this.body.length - 1][0] + arr_ctrl_all[this.curIndex][0], this.body[this.body.length - 1][1] + arr_ctrl_all[this.curIndex][1]]);
+	            (this.IsDead) ? (alert('Game Over'), location.reload()) : ((this.lastX == xx && this.lastY == yy) ? (document.getElementById("score" + _index).innerHTML = (this.score += 10), genFood(), localStorage.setItem("score" + _index, this.score)) : (this.body.shift()));
 	            window.objTimerID = objTimer(this, this.Move, this.speed, _index);
 	        };
 	    }
@@ -117,9 +105,17 @@
 
 	    function draw() {
 	        context.clearRect(0, 0, canvas.width, canvas.height);
-	        for (i = 0; i < all_snakes.length; ++i)
-	            for (j = 0; j < all_snakes[i].body.length; ++j)
-	                context.fillStyle = arr_color[i][0], context.fillRect(all_snakes[i].body[j][0], all_snakes[i].body[j][1], cube, cube);
+	        if (!bln_multi) {
+	            for (var i = 0; i < all_snakes.length; ++i)
+	                for (var j = 0; j < all_snakes[i].body.length; ++j)
+	                    context.fillStyle = all_snakes[i].color[0], context.fillRect(all_snakes[i].body[j][0], all_snakes[i].body[j][1], cube, cube);
+	        }
+	        else {
+	            for (var i = 0; i < all_remote_snake.length; ++i)
+	                for (var j = 0; j < all_remote_snake[i].body.length; ++j)
+	                    context.fillRect(all_remote_snake[i].body[j][0], all_remote_snake[i].body[j][1], cube, cube);
+            }
+
 	        context.fillRect(xx, yy, cube, cube);
 	    }
 
@@ -150,21 +146,26 @@
 	        }
 	    }
 
-	    function DispatchToAll(e) {
+	    function initMultiPlayer() {
+            
+	        ws = new WebSocket("ws://" + document.getElementById('ip').value + ":8008");
+	        ws.onmessage = function (e) {
+	            bln_multi = true;
+	            context.clearRect(0, 0, canvas.width, canvas.height);
+	            if (e.data[0] == 'f') {
+	                var food = new Array();
+	                food = JSON.parse(e.data.substring(1, e.data.length));
+	                context.fillRect(food[0], food[1], cube, cube);
+	            }
+	            else {
+	                all_remote_snake = JSON.parse(e.data);
+	            }
+	        };
 
-	        if (global_key_ctrl[e.keyCode] != undefined) {
-                var snake_num = (global_key_ctrl[e.keyCode] - (global_key_ctrl[e.keyCode]) % 4 ) / 4, cur_index = (global_key_ctrl[e.keyCode]) % 4;
-	            if (!((arr_ctrl_all[all_snakes[snake_num].curIndex][0] + arr_ctrl_all[cur_index][0] == 0) && (arr_ctrl_all[all_snakes[snake_num].curIndex][1] + arr_ctrl_all[cur_index][1] == 0)))
-	                all_snakes[snake_num].lastIndex = all_snakes[snake_num].curIndex, all_snakes[snake_num].curIndex = cur_index;
-	        }
-         /*    
-             for (var i = 0; i < all_snakes.length; ++i)
-	            for (var j = 0; j < 4; ++j)
-	                if ((k = all_snakes[i].lastIndex), all_snakes[i].btnCtrl[j].value == (l = e.keyCode))
-	                    if (!((k == 0 && l == 1) || (k == 1 && l == 0) || (k == 2 && l == 3) || (k == 3 && l == 2)))
-	                        all_snakes[i].lastIndex = all_snakes[i].curIndex, all_snakes[i].curIndex = j;
-                            */
+	        ws.onopen = function () {
+	            document.getElementById('chat_log').innerHTML += "\n连接成功！\n准备交换玩家信息......\n";
+	        };
+	        document.addEventListener("keydown", function (e) { ws.send( e.keyCode) }, false);
 	    }
-
     </script>
 </html>
